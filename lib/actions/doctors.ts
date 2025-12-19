@@ -48,11 +48,12 @@ export async function createDoctor(input: CreateDoctorInput) {
     revalidatePath("/admin");
 
     return doctor;
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error creating doctor:", error);
 
     // handle unique constraint violation (email already exists)
-    if (error?.code === "P2002") {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((error as any)?.code === "P2002") {
       throw new Error("A doctor with this email already exists");
     }
 

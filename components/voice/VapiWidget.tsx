@@ -7,11 +7,23 @@ import { Card } from "../ui/card";
 import Image from "next/image";
 import { Button } from "../ui/button";
 
+interface Message {
+  role: string;
+  content: string;
+}
+
+interface VapiMessage {
+  type: string;
+  transcriptType: string;
+  transcript: string;
+  role: string;
+}
+
 function VapiWidget() {
   const [callActive, setCallActive] = useState(false);
   const [connecting, setConnecting] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [callEnded, setCallEnded] = useState(false);
 
   const { user, isLoaded } = useUser();
@@ -52,14 +64,14 @@ function VapiWidget() {
       setIsSpeaking(false);
     };
 
-    const handleMessage = (message: any) => {
+    const handleMessage = (message: VapiMessage) => {
       if (message.type === "transcript" && message.transcriptType === "final") {
         const newMessage = { content: message.transcript, role: message.role };
         setMessages((prev) => [...prev, newMessage]);
       }
     };
 
-    const handleError = (error: any) => {
+    const handleError = (error: unknown) => {
       console.log("Vapi Error", error);
       setConnecting(false);
       setCallActive(false);
@@ -188,10 +200,10 @@ function VapiWidget() {
                 {isSpeaking
                   ? "Speaking..."
                   : callActive
-                  ? "Listening..."
-                  : callEnded
-                  ? "Call ended"
-                  : "Waiting..."}
+                    ? "Listening..."
+                    : callEnded
+                      ? "Call ended"
+                      : "Waiting..."}
               </span>
             </div>
           </div>
@@ -205,7 +217,7 @@ function VapiWidget() {
             {/* User Image */}
             <div className="relative size-32 mb-4">
               <Image
-                src={user.imageUrl!}
+                src={user?.imageUrl || "/placeholder-user.jpg"}
                 alt="User"
                 width={128}
                 height={128}
@@ -271,8 +283,8 @@ function VapiWidget() {
             callActive
               ? "bg-destructive hover:bg-destructive/90"
               : callEnded
-              ? "bg-red-500 hover:bg-red-700"
-              : "bg-primary hover:bg-primary/90"
+                ? "bg-red-500 hover:bg-red-700"
+                : "bg-primary hover:bg-primary/90"
           } text-white relative`}
           onClick={toggleCall}
           disabled={connecting || callEnded}
@@ -285,10 +297,10 @@ function VapiWidget() {
             {callActive
               ? "End Call"
               : connecting
-              ? "Connecting..."
-              : callEnded
-              ? "Call Ended"
-              : "Start Call"}
+                ? "Connecting..."
+                : callEnded
+                  ? "Call Ended"
+                  : "Start Call"}
           </span>
         </Button>
       </div>

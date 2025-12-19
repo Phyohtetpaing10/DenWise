@@ -2,9 +2,27 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "../prisma";
-import { AppointmentStatus } from "@prisma/client";
+import { AppointmentStatus, Prisma } from "@prisma/client";
 
-const transformAppointment = (appointment: any) => {
+type AppointmentWithRelations = Prisma.AppointmentGetPayload<{
+  include: {
+    user: {
+      select: {
+        firstName: true;
+        lastName: true;
+        email: true;
+      };
+    };
+    doctor: {
+      select: {
+        name: true;
+        imageUrl: true;
+      };
+    };
+  };
+}>;
+
+const transformAppointment = (appointment: AppointmentWithRelations) => {
   return {
     ...appointment,
     patientName: `${appointment.user.firstName || ""} ${

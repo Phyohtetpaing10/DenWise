@@ -14,6 +14,15 @@ import { APPOINTMENT_TYPES } from "@/lib/utils";
 import { format } from "date-fns";
 import { useState } from "react";
 import { toast } from "sonner";
+import Image from "next/image";
+
+interface BookedAppointment {
+  doctorName: string;
+  date: string | Date;
+  time: string;
+  patientEmail: string;
+  [key: string]: unknown;
+}
 
 const Page = () => {
   const [selectedDentistId, setSelectedDentistId] = useState<string | null>(
@@ -24,7 +33,8 @@ const Page = () => {
   const [selectedType, setSelectedType] = useState("");
   const [currentStep, setCurrentStep] = useState(1); // 1: select dentist, 2: select time, 3: confirm
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-  const [bookedAppointment, setBookedAppointment] = useState<any>(null);
+  const [bookedAppointment, setBookedAppointment] =
+    useState<BookedAppointment | null>(null);
 
   const bookAppointmentMutation = useBookAppointment();
   const { data: userAppointments = [] } = useUserAppointments();
@@ -184,9 +194,11 @@ const Page = () => {
               >
                 <div className="flex items-center gap-3 mb-3">
                   <div className="size-10 bg-primary/10 rounded-full flex items-center justify-center">
-                    <img
+                    <Image
                       src={appointment.doctorImageUrl}
                       alt={appointment.doctorName}
+                      width={40}
+                      height={40}
                       className="size-10 rounded-full"
                     />
                   </div>
